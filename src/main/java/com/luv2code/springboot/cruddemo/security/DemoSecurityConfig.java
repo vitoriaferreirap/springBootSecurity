@@ -21,7 +21,25 @@ public class DemoSecurityConfig {
 
     @Bean
     public UserDetailsManager userDetailsManager(DataSource dataSource) {
-        return new JdbcUserDetailsManager(dataSource);
+
+        /*
+         * O UserDetailsManager é uma interface que fornece métodos para gerenciar
+         * usuários e suas funções.
+         * O JdbcUserDetailsManager é uma implementação dessa interface que usa JDBC
+         * para acessar os dados ele permite configurar consultas SQL personalizadas
+         * para buscar usuários e suas funções
+         */
+
+        JdbcUserDetailsManager jdbcUserDetailsManager = new JdbcUserDetailsManager(dataSource);
+
+        // Configura o esquema de autenticação JDBC
+        jdbcUserDetailsManager.setUsersByUsernameQuery(
+                "SELECT user_id, pw, active FROM members WHERE user_id = ?");
+
+        jdbcUserDetailsManager.setAuthoritiesByUsernameQuery(
+                "SELECT user_id, role FROM roles WHERE user_id = ?");
+
+        return jdbcUserDetailsManager;
     }
 
     // Restingir o acesso com base em funçoes
